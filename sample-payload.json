@@ -1,0 +1,17 @@
+{
+  "version": 3,
+  "mappings": ";AAAA;AACA;AACA;;AAEA,MAAMA,WAAWC,SAASC,eAAe;AAEzCC,SAASC,OACP,wBAAC,KAAD;AAAA;AAAA;AAAA;AAAA,UACAJ;",
+  "names": [
+    "location",
+    "document",
+    "getElementById",
+    "ReactDOM",
+    "render"
+  ],
+  "sources": [
+    "/home/gabriel/Code/javascript/mcg-demonstration/src/main.jsx"
+  ],
+  "sourcesContent": [
+    "import React from 'react'\nimport ReactDOM from 'react-dom'\nimport App from './App'\n\nconst location = document.getElementById('root')\n\nReactDOM.render(\n  <App />,\n  location\n)\n"
+  ]
+}

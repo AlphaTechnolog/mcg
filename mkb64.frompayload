@@ -1,0 +1,33 @@
+#!/bin/bash
+error () {
+  >&2 echo $@
+  exit 1
+}
+
+show_usage () {
+  error "usage: mkb64.frompayload <payload-file-uri> <base64-file-uri>"
+}
+
+payload_file_uri=$1
+base64_file_uri=$2
+
+if [[ $payload_file_uri == "" ]]; then
+  show_usage
+fi
+
+if [[ $base64_file_uri == "" ]]; then
+  show_usage
+fi
+
+if test -f $base64_file_uri; then
+  newuri="${base64_file_uri}.old"
+  echo "$base64_file_uri already exists, I'm moving it to $newuri"
+  mv $base64_file_uri $newuri
+fi
+
+echo "Generating..."
+if ! echo "$(base64 $payload_file_uri)" > $base64_file_uri; then
+  error "Cannot generate it, the command return a status code distinct that 0"
+fi
+
+echo "Done!"

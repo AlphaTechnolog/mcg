@@ -1,0 +1,83 @@
+#!/bin/bash
+clear
+
+error () {
+  >&2 echo $@
+  exit 1
+}
+
+mapping=$1
+ext=$2
+
+if [[ $mapping == "" || $mapping == "--help" || $mapping == "-h" || $mapping == "help" ]]; then
+  error "usage: mcg <mapping> <ext (default: txt)>"
+fi
+
+if [[ $ext == "" ]]; then
+  ext='txt'
+fi
+
+check_deps () {
+  declare -a deps=('bat' 'json-parser' 'base64')
+  for dep in ${deps[@]}; do
+    if ! which $dep 2>&1 > /dev/null; then
+      error "before run this script, please, first install $dep"
+    fi
+  done
+}
+
+check_deps
+
+die () {
+  local message=$1
+  local location=$2
+  if [[ $message == '' ]]; then
+    die 'message is undefined' 'die'
+  fi
+  if [[ $location == '' ]]; then
+    die 'location is undefined' 'die'
+  fi
+  error "script error (report this error): $location: $message"
+}
+
+print_file_content () {
+  local content=$1
+  local ext=$2
+  if [[ $content == "" ]]; then
+    die 'content is undefined' 'print_file_content'
+  fi
+  if [[ $ext == "" ]]; then
+    die 'ext is undefined' 'print_file_content'
+  fi
+
+  filename="*.${ext}"
+
+  echo "$content" | bat --theme=TwoDark \
+    --style=plain \
+    --file-name=$filename
+}
+
+decode_mapping () {
+  local mapping=$1
+  if [[ $mapping == "" ]]; then
+    die 'mapping is undefined' 'decode_mapping'
+  fi
+
+  echo "$mapping" | base64 -d
+}
+
+get_file_content () {
+  local decoded_mapping=$1
+  if [[ $decoded_mapping == "" ]]; then
+    die 'decoded_mapping is undefined' 'get_file_content'
+  fi
+
+  echo "$decoded_mapping" | json-parser \
+    --stdin \
+    '.sourcesContent[0]'
+}
+
+decoded_mapping=$(decode_mapping "$mapping")
+content=$(get_file_content "$decoded_mapping")
+
+print_file_content "$content" "$ext"
